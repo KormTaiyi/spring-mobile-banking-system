@@ -1,8 +1,7 @@
 package com.example.mobilebankingapi.controller;
-
-import com.example.mobilebankingapi.dto.CreateCustomerRequest;
-import com.example.mobilebankingapi.dto.CustomerResponse;
-import com.example.mobilebankingapi.dto.UpdateCustomerRequest;
+import com.example.mobilebankingapi.dto.customer.CreateCustomerRequest;
+import com.example.mobilebankingapi.dto.customer.CustomerResponse;
+import com.example.mobilebankingapi.dto.customer.UpdateCustomerRequest;
 import com.example.mobilebankingapi.service.CustomerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,9 +23,10 @@ public class CustomerController {
         customerService.deleteByPhoneNumber(phoneNumber);
     }
 
+    @ResponseStatus(HttpStatus.OK)
     @PatchMapping("/{phoneNumber}")
     public CustomerResponse updateByPhoneNumber(@PathVariable String phoneNumber,
-                                                @RequestBody
+                                                @Valid @RequestBody
                                                     UpdateCustomerRequest updateCustomerRequest) {
         return customerService.updateByPhoneNumber(phoneNumber, updateCustomerRequest);
     }
@@ -43,7 +43,7 @@ public class CustomerController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public CustomerResponse createNew(@Valid @RequestBody CreateCustomerRequest createCustomerRequestDto){
-        return customerService.createNew(createCustomerRequestDto);
+    public CustomerResponse createNew(@Valid @RequestBody CreateCustomerRequest createCustomerRequest){
+        return customerService.createNew(createCustomerRequest);
     }
 }

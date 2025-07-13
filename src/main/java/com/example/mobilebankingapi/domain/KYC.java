@@ -1,4 +1,4 @@
-package com.example.mobilebankingapi.doman;
+package com.example.mobilebankingapi.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -13,13 +13,14 @@ import lombok.Setter;
 public class KYC {
 
     @Id
+    @GeneratedValue
     private String id;
     private String nationalCardId;
     private Boolean isVerified;
     private Boolean isDeleted;
 
     @OneToOne
-    @MapsId
+//    @MapsId
     @JoinColumn(name="cust_id")
     private Customer customer;
 }

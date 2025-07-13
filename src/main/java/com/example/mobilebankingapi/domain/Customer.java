@@ -1,4 +1,4 @@
-package com.example.mobilebankingapi.doman;
+package com.example.mobilebankingapi.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -13,8 +13,8 @@ import java.util.List;
 
 public class Customer {
     @Id
-    @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(nullable = false)
     private String fullName;
@@ -35,10 +35,10 @@ public class Customer {
     private String remark;
 
     @OneToMany(mappedBy = "customer")
-    private List<Accounts> accounts;
+    private List<Account> accounts;
 
     @OneToOne(mappedBy = "customer")
-    @PrimaryKeyJoinColumn
+//    @JoinColumn(unique = true)
     private KYC kyc;
 
 }

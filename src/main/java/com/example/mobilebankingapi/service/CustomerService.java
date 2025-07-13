@@ -1,8 +1,8 @@
 package com.example.mobilebankingapi.service;
 
-import com.example.mobilebankingapi.dto.CreateCustomerRequest;
-import com.example.mobilebankingapi.dto.CustomerResponse;
-import com.example.mobilebankingapi.dto.UpdateCustomerRequest;
+import com.example.mobilebankingapi.dto.customer.CreateCustomerRequest;
+import com.example.mobilebankingapi.dto.customer.CustomerResponse;
+import com.example.mobilebankingapi.dto.customer.UpdateCustomerRequest;
 
 import java.util.List;
 
@@ -13,5 +13,4 @@ public interface CustomerService {
     CustomerResponse findByPhoneNumber(String phoneNumber);
     CustomerResponse createNew(CreateCustomerRequest createCustomerRequestDto);
     List<CustomerResponse> findAll();
-    CustomerResponse findByIPhoneNumber(String phoneNumber);
 }

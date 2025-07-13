@@ -1,4 +1,4 @@
-package com.example.mobilebankingapi.doman;
+package com.example.mobilebankingapi.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -20,5 +20,5 @@ public class AccountType {
     private String name;    // Savings, Current
 
     @OneToMany(mappedBy = "accountType")
-    private List<Accounts> accounts;
+    private List<Account> accounts;
 }

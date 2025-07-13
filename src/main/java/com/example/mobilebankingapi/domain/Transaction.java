@@ -1,4 +1,4 @@
-package com.example.mobilebankingapi.doman;
+package com.example.mobilebankingapi.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    private Long id;
 
     @Column(nullable = false)
     private String sender;

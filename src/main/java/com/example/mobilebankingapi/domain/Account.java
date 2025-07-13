@@ -1,4 +1,4 @@
-package com.example.mobilebankingapi.doman;
+package com.example.mobilebankingapi.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @Entity
 @Table(name = "accounts")
-public class Accounts {
+public class Account {
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Integer id;
@@ -24,11 +24,9 @@ public class Accounts {
     private Double balance;
 
     @Column(nullable = false)
-    private Boolean isActive;
-
+    private Boolean isDeleted;
 
     @ManyToOne
     @JoinColumn(name = "cust_id")
     private Customer customer;
-
 }

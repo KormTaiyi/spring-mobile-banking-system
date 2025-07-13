@@ -1,4 +1,13 @@
 package com.example.mobilebankingapi.exception;
 
-public record ErrorResponse() {
+import lombok.Builder;
+
+import java.time.LocalDateTime;
+@Builder
+public record ErrorResponse<T>(
+        String message,
+        Integer status,
+        LocalDateTime timestamp,
+        T details
+) {
 }
