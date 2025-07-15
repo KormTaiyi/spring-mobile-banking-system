@@ -11,6 +11,7 @@ import com.example.mobilebankingapi.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -77,11 +78,12 @@ public class AccountServiceImpl implements AccountService {
         return accountMapper.fromAccounts(account);
     }
 
+    @Transactional
     @Override
-    public AccountResponse disableAccountByAccountNumber(String accountNumber,UpdateAccountRequest updateAccountRequest) {
-        Account account = accountRepository.findByAccountNumber(accountNumber).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"Account not found with account number: " + accountNumber));
-        account.setIsDeleted(true);
-        account = accountRepository.save(account);
-        return accountMapper.fromAccounts(account);
+    public void disableAccountByAccountNumber(String accountNumber) {
+        if(!accountRepository.isExistsByAccountNumber(accountNumber)){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Account not found with account number: " + accountNumber);
+        }
+        customerRepository.disableAccountByAccountNumber(accountNumber);
     }
 }

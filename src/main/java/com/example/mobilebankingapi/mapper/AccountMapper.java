@@ -1,7 +1,6 @@
 package com.example.mobilebankingapi.mapper;
 
 import com.example.mobilebankingapi.domain.Account;
-import com.example.mobilebankingapi.domain.Customer;
 import com.example.mobilebankingapi.dto.account.AccountResponse;
 import com.example.mobilebankingapi.dto.account.CreateAccountRequest;
 import com.example.mobilebankingapi.dto.account.UpdateAccountRequest;

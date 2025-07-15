@@ -11,4 +11,6 @@ public interface CustomerRepository extends JpaRepository<Customer,Integer> {
     Optional<Customer> findByPhoneNumber(String phoneNumber);
 
     boolean existsByCustomerId(String customerId);
+
+    void disableAccountByAccountNumber(String accountNumber);
 }

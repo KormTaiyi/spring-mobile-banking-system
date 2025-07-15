@@ -51,9 +51,9 @@ public class AccountController {
         return accountService.updateAccountInfoByAccountNumber(accountNumber, updateAccountRequest);
     }
 
-    @PatchMapping("/{accountNumber}/isDeleted")
-    public AccountResponse disableAccountByAccountNumber(@PathVariable String accountNumber,@RequestBody UpdateAccountRequest updateAccountRequest) {
-        return accountService.disableAccountByAccountNumber(accountNumber, updateAccountRequest);
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PutMapping("/{accountNumber}")
+    public void disableAccountByAccountNumber(@PathVariable String accountNumber) {
+         accountService.disableAccountByAccountNumber(accountNumber);
     }
-
 }

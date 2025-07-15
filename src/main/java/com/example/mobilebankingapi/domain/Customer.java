@@ -41,4 +41,7 @@ public class Customer {
 //    @JoinColumn(unique = true)
     private KYC kyc;
 
+    @Column(unique = true, nullable = false)
+    private String nationalId;
+
 }

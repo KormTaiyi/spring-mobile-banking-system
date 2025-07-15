@@ -14,5 +14,5 @@ public interface AccountService {
     List<AccountResponse> findAccountByCustomer(String customerId);
     void deleteAccountByAccountNumber(String accountNumber);
     AccountResponse updateAccountInfoByAccountNumber(String accountNumber, UpdateAccountRequest updateAccountRequest);
-    AccountResponse disableAccountByAccountNumber(String accountNumber,UpdateAccountRequest updateAccountRequest);
+    void disableAccountByAccountNumber(String accountNumber);
 }
