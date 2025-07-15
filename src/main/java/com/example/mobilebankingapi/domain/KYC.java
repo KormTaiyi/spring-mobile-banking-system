@@ -13,10 +13,15 @@ import lombok.Setter;
 public class KYC {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
+
+    @Column(nullable = false)
     private String nationalCardId;
+
+    @Column(nullable = false)
     private Boolean isVerified;
+
     private Boolean isDeleted;
 
     @OneToOne

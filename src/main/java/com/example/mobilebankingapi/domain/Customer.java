@@ -22,6 +22,12 @@ public class Customer {
     @Column(length = 15)
     private String gender;
 
+    @Column(nullable = false,unique = true)
+    private String nationalCardId;
+
+    @Enumerated(EnumType.STRING)
+    private CustomerSegment segment;
+
     @Column(nullable = false)
     private String email;
 
@@ -40,8 +46,5 @@ public class Customer {
     @OneToOne(mappedBy = "customer")
 //    @JoinColumn(unique = true)
     private KYC kyc;
-
-    @Column(unique = true, nullable = false)
-    private String nationalId;
 
 }

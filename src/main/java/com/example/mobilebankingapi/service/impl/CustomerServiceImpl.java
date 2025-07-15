@@ -1,15 +1,19 @@
 package com.example.mobilebankingapi.service.impl;
 
 import com.example.mobilebankingapi.domain.Customer;
+import com.example.mobilebankingapi.domain.CustomerSegment;
+import com.example.mobilebankingapi.domain.KYC;
 import com.example.mobilebankingapi.dto.customer.CreateCustomerRequest;
 import com.example.mobilebankingapi.dto.customer.CustomerResponse;
 import com.example.mobilebankingapi.dto.customer.UpdateCustomerRequest;
 import com.example.mobilebankingapi.mapper.CustomerMapper;
 import com.example.mobilebankingapi.repository.CustomerRepository;
+import com.example.mobilebankingapi.repository.KycRepository;
 import com.example.mobilebankingapi.service.CustomerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
@@ -19,6 +23,8 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class CustomerServiceImpl implements CustomerService {
+
+    private final KycRepository kycRepository;
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
 
@@ -51,6 +57,7 @@ public class CustomerServiceImpl implements CustomerService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not found with phone number: " + phoneNumber));
     }
 
+    @Transactional
     @Override
     public CustomerResponse createNew(CreateCustomerRequest createCustomerRequest) {
 
@@ -67,9 +74,17 @@ public class CustomerServiceImpl implements CustomerService {
         Customer customer = customerMapper.toCustomer(createCustomerRequest);
         customer.setAccounts(new ArrayList<>());
         customer.setPhoneNumber(createCustomerRequest.phoneNumber());
+        customer.setNationalCardId(createCustomerRequest.nationalCardId());
+        customer.setSegment(CustomerSegment.valueOf(createCustomerRequest.segment()));
+
 
 
         customer = customerRepository.save(customer);
+
+        KYC kyc = new KYC();
+        kyc.setCustomer(customer);
+        kyc.setIsVerified(false);
+        kycRepository.save(kyc);
 
         return customerMapper.fromCustomer(customer);
     }

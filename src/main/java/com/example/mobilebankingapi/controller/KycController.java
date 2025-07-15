@@ -1,13 +1,23 @@
 package com.example.mobilebankingapi.controller;
 
-import lombok.NoArgsConstructor;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.example.mobilebankingapi.dto.customer.CreateCustomerRequest;
+import com.example.mobilebankingapi.dto.customer.CustomerResponse;
+import com.example.mobilebankingapi.service.CustomerService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@NoArgsConstructor
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/kyc")
 public class KycController {
 
-    public
+    private final CustomerService customerService;
+
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping
+    public CustomerResponse createNew(@Valid @RequestBody CreateCustomerRequest createCustomerRequest){
+        return customerService.createNew(createCustomerRequest);
+    }
 }
