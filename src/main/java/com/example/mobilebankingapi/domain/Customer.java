@@ -1,50 +1,74 @@
 package com.example.mobilebankingapi.domain;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
-@Setter
 @Getter
+@Setter
 @NoArgsConstructor
 @Entity
-@Table(name="customers")
-
+@Table(name = "customers")
 public class Customer {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @Column(nullable = false)
-    private String fullName;
+    private String fullName; // full_name
 
-    @Column(length = 15)
+    @Column(length = 15, nullable = false)
     private String gender;
 
-    @Column(nullable = false,unique = true)
-    private String nationalCardId;
-
-    @Enumerated(EnumType.STRING)
-    private CustomerSegment segment;
-
     @Column(nullable = false)
+    private LocalDate dob;
+
+    @Column(unique = true)
     private String email;
 
     @Column(unique = true)
     private String phoneNumber;
 
-    @Column(nullable = false)
-    private Boolean isDeleted;
-
     @Column(columnDefinition = "TEXT")
     private String remark;
+
+    @Column(length = 100)
+    private String address;
+    @Column(length = 50)
+    private String cityOrProvince;
+    @Column(length = 50)
+    private String country;
+    @Column(length = 50)
+    private String zipCode;
+
+    @Column(length = 50)
+    private String employmentType;
+    @Column(length = 50)
+    private String position;
+    @Column(length = 50)
+    private String companyName;
+    @Column(length = 50)
+    private String mainSourceOfIncome;
+    @Column(length = 50)
+    private BigDecimal monthlyIncomeRange;
+
+    @Column(nullable = false)
+    private Boolean isDeleted; // soft delete
 
     @OneToMany(mappedBy = "customer")
     private List<Account> accounts;
 
-    @OneToOne(mappedBy = "customer")
-//    @JoinColumn(unique = true)
+    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
     private KYC kyc;
+
+    @ManyToOne
+    private CustomerSegment customerSegment;
 
 }

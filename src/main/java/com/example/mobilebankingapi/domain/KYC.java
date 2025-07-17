@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-// know your customer
+// Know your customer
 @Getter
 @Setter
 @NoArgsConstructor
@@ -13,19 +13,19 @@ import lombok.Setter;
 public class KYC {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    private Integer id;
 
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false, length = 12)
     private String nationalCardId;
 
     @Column(nullable = false)
     private Boolean isVerified;
 
+    @Column(nullable = false)
     private Boolean isDeleted;
 
-    @OneToOne
-//    @MapsId
-    @JoinColumn(name="cust_id")
+    @OneToOne(optional = false)
+    @MapsId
+    @JoinColumn(name = "cust_id")
     private Customer customer;
 }

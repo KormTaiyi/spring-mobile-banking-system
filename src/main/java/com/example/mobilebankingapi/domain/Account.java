@@ -1,32 +1,49 @@
 package com.example.mobilebankingapi.domain;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import java.math.BigDecimal;
 
-@Setter
 @Getter
+@Setter
 @NoArgsConstructor
 @Entity
 @Table(name = "accounts")
 public class Account {
+
     @Id
-    @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(unique = true,nullable = false)
-    private String accountNumber;
+    @Column(unique = true, nullable = false, length = 32)
+    private String actNo;
+
+    @Column(nullable = false, length = 50)
+    private String actName;
+
+    @Column(nullable = false, length = 50)
+    private String actCurrency;
 
     @Column(nullable = false)
-    private String accountType;
+    private BigDecimal balance;
 
     @Column(nullable = false)
-    private Double balance;
+    private BigDecimal overLimit;
+
+    @Column(nullable = false)
+    private Boolean isHide;
 
     @Column(nullable = false)
     private Boolean isDeleted;
 
     @ManyToOne
-    @JoinColumn(name = "cust_id")
-    private Customer customer;
+    @JoinColumn(nullable = false, name = "cust_id", referencedColumnName = "id")
+    private Customer customer; // cust_id
+
+    @ManyToOne
+    private AccountType accountType;
+
 }

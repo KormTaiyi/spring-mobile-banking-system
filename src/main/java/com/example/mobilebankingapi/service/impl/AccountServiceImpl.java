@@ -1,89 +1,92 @@
 package com.example.mobilebankingapi.service.impl;
 
+import com.example.mobilebankingapi.Util.CurrencyUtil;
 import com.example.mobilebankingapi.domain.Account;
+import com.example.mobilebankingapi.domain.AccountType;
+import com.example.mobilebankingapi.domain.Customer;
 import com.example.mobilebankingapi.dto.account.AccountResponse;
 import com.example.mobilebankingapi.dto.account.CreateAccountRequest;
-import com.example.mobilebankingapi.dto.account.UpdateAccountRequest;
 import com.example.mobilebankingapi.mapper.AccountMapper;
 import com.example.mobilebankingapi.repository.AccountRepository;
+import com.example.mobilebankingapi.repository.AccountTypeRepository;
 import com.example.mobilebankingapi.repository.CustomerRepository;
 import com.example.mobilebankingapi.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
+import java.math.BigDecimal;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepository;
-    private final AccountMapper accountMapper;
     private final CustomerRepository customerRepository;
+    private final AccountTypeRepository accountTypeRepository;
+    private final AccountMapper accountMapper;
 
     @Override
-    public AccountResponse createAccount(CreateAccountRequest createAccountRequest) {
-        if(accountRepository.existsByAccountNumber(createAccountRequest.accountNumber())){
-            throw new ResponseStatusException(HttpStatus.CONFLICT,"Account already exists with account number: " + createAccountRequest.accountNumber());
+    public AccountResponse createNew(CreateAccountRequest createAccountRequest) {
+
+        Customer customer = customerRepository
+                .findByPhoneNumber(createAccountRequest.phoneNumber())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Customer phone number not found"));
+
+        AccountType accountType = accountTypeRepository
+                .findByType(createAccountRequest.accountType())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Account type not found"));
+
+        Account account = accountMapper.toAccount(createAccountRequest);
+        account.setAccountType(accountType);
+        account.setCustomer(customer);
+
+        if (account.getActNo().isBlank()) { // Auto generate
+            String actNo;
+            do {
+                actNo = String.format("%09d", new Random().nextInt(1_000_000_000)); // Max: 999,999,999
+            } while (accountRepository.existsByActNo(actNo));
+            account.setActNo(actNo);
+        } else { // From DTO, check validation actNo
+            if (accountRepository.existsByActNo(account.getActNo())) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        "Account number already exists");
+            }
         }
-        Account account = accountMapper.toAccountResponse(createAccountRequest);
+
+        account.setIsHide(false);
+        account.setIsDeleted(false);
+        account.setActCurrency(createAccountRequest.actCurrency().name());
+
+        if (account.getCustomer().getCustomerSegment().getSegment().equals("REGULAR")) {
+            account.setOverLimit(BigDecimal.valueOf(5000));
+        } else if (account.getCustomer().getCustomerSegment().getSegment().equals("SILVER")) {
+            account.setOverLimit(BigDecimal.valueOf(50000));
+        } else {
+            account.setOverLimit(BigDecimal.valueOf(100000));
+        }
+
+        // Validate balance
+        switch (createAccountRequest.actCurrency()) {
+            case CurrencyUtil.DOLLAR -> {
+                if (createAccountRequest.balance().compareTo(BigDecimal.TEN) < 0) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Balance must be greater than 10 dollars");
+                }
+            }
+            case CurrencyUtil.RIEL -> {
+                if (createAccountRequest.balance().compareTo(BigDecimal.valueOf(40000)) < 0) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Balance must be greater than 40000 riels");
+                }
+            }
+            default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Currency is not available");
+        }
+
         account = accountRepository.save(account);
-        return accountMapper.fromAccounts(account);
+
+        return accountMapper.fromAccount(account);
     }
 
-    @Override
-    public List<AccountResponse> findAllAccounts() {
-        List<Account> accounts = accountRepository.findAll();
-        return accounts
-                .stream()
-                .map(accountMapper::fromAccounts)
-                .toList();
-    }
-
-    @Override
-    public AccountResponse findAccountByAccountNumber(String accountNumber) {
-        return accountRepository.findByAccountNumber(accountNumber)
-                .map(accountMapper::fromAccounts)
-                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Account not found with account number: " + accountNumber));
-    }
-
-    @Override
-    public List<AccountResponse> findAccountByCustomer(String customerId) {
-        if(!customerRepository.existsByCustomerId(customerId)){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "Customer not found with id: " + customerId);
-        }
-        return accountRepository.findByCustomerId(customerId).stream().map(accountMapper::fromAccounts).toList();
-    }
-
-    @Override
-    public void deleteAccountByAccountNumber(String accountNumber) {
-        Account account = accountRepository
-                .findByAccountNumber(accountNumber)
-                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                "Account not found with account number: " + accountNumber));
-        accountRepository.delete(account);
-    }
-
-    @Override
-    public AccountResponse updateAccountInfoByAccountNumber(String accountNumber, UpdateAccountRequest updateAccountRequest) {
-        Account account = accountRepository.findByAccountNumber(accountNumber)
-                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Account not found with account number: " + accountNumber));
-        accountMapper.toCustomerPartially(updateAccountRequest, account);
-        account = accountRepository.save(account);
-        return accountMapper.fromAccounts(account);
-    }
-
-    @Transactional
-    @Override
-    public void disableAccountByAccountNumber(String accountNumber) {
-        if(!accountRepository.isExistsByAccountNumber(accountNumber)){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Account not found with account number: " + accountNumber);
-        }
-        customerRepository.disableAccountByAccountNumber(accountNumber);
-    }
 }

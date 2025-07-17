@@ -7,31 +7,32 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 
-
-@Entity
-@Setter
 @Getter
+@Setter
 @NoArgsConstructor
+@Entity
 @Table(name = "transactions")
-
 public class Transaction {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
-    private String sender;
-
-    @Column(nullable = false)
-    private String receiver;
+    private Integer id;
 
     @Column(nullable = false)
     private BigDecimal amount;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(length = 50)
     private String remark;
 
-    @ManyToOne
-    @JoinColumn(name = "account_id", nullable = false)
+    @Column(nullable = false)
+    private Boolean isDeleted;
+
+    @ManyToOne(optional = false)
     private TransactionType transactionType;
+
+    @ManyToOne(optional = false)
+    private Account sender;
+
+    @ManyToOne(optional = false)
+    private Account receiver;
 }
